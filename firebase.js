@@ -1,4 +1,4 @@
-import * as firebase from "firebase";
+import firebase from "firebase";
 import "firebase/auth";
 import "firebase/firestore";
 
@@ -12,6 +12,7 @@ const firebaseConfig = {
   measurementId: "G-HDDNQT2EG8",
 };
 
+// const app = firebase.initializeApp(firebaseConfig);
 let app;
 if (firebase.apps.length === 0) {
   app = firebase.initializeApp(firebaseConfig);
