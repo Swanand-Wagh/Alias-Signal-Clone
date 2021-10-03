@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
   SafeAreaView,
@@ -66,9 +66,10 @@ const ChatScreen = ({ navigation, route }) => {
         </View>
       ),
     });
-  }, []);
+  }, [navigation, messages]);
 
   const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([]);
 
   const sendMessage = () => {
     Keyboard.dismiss();
@@ -84,6 +85,24 @@ const ChatScreen = ({ navigation, route }) => {
     setInput("");
   };
 
+  useEffect(() => {
+    const unsubscribe = db
+      .collection("chats")
+      .doc(route.params.id)
+      .collection("messages")
+      .orderBy("timestamp", "asc")
+      .onSnapshot((snap) =>
+        setMessages(
+          snap.docs.map((doc) => ({
+            id: doc.id,
+            data: doc.data(),
+          }))
+        )
+      );
+
+    return unsubscribe;
+  }, [route]);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <StatusBar style="light" />
@@ -93,7 +112,50 @@ const ChatScreen = ({ navigation, route }) => {
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <>
-            <ScrollView>{/* Chat here */}</ScrollView>
+            <ScrollView contentContainerStyle={{ paddingTop: 12 }}>
+              {messages.map(({ id, data }) =>
+                data.email === auth.currentUser.email ? (
+                  <View key={id} style={styles.receiver}>
+                    <Avatar
+                      rounded
+                      size={30}
+                      source={{
+                        uri: data.photoURL,
+                      }}
+                      position="absolute"
+                      containerStyle={{
+                        position: "absolute",
+                        bottom: -15,
+                        right: -5,
+                      }}
+                      bottom={-15}
+                      right={-5}
+                    />
+                    <Text style={styles.receiverText}>{data.message}</Text>
+                  </View>
+                ) : (
+                  <View style={styles.sender}>
+                    <Avatar
+                      rounded
+                      size={30}
+                      source={{
+                        uri: data.photoURL,
+                      }}
+                      position="absolute"
+                      containerStyle={{
+                        position: "absolute",
+                        bottom: -15,
+                        left: -5,
+                      }}
+                      bottom={-15}
+                      left={-5}
+                    />
+                    <Text style={styles.senderText}>{data.message}</Text>
+                    <Text style={styles.senderName}>{data.displayName}</Text>
+                  </View>
+                )
+              )}
+            </ScrollView>
             <View style={styles.footer}>
               <TextInput
                 placeholder="Signal Message"
@@ -136,5 +198,41 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     color: "grey",
     borderRadius: 30,
+  },
+  receiver: {
+    padding: 15,
+    backgroundColor: "#ececec",
+    alignSelf: "flex-end",
+    borderRadius: 20,
+    marginRight: 15,
+    marginBottom: 20,
+    maxWidth: "80%",
+    position: "relative",
+  },
+  sender: {
+    padding: 15,
+    backgroundColor: "#2b68e6",
+    alignSelf: "flex-start",
+    borderRadius: 20,
+    margin: 15,
+    maxWidth: "80%",
+    position: "relative",
+  },
+  senderName: {
+    left: 10,
+    paddingRight: 10,
+    fontSize: 10,
+    color: "white",
+  },
+  senderText: {
+    color: "white",
+    fontWeight: "500",
+    marginLeft: 10,
+    marginBottom: 15,
+  },
+  receiverText: {
+    fontWeight: "500",
+    marginLeft: 10,
+    color: "black",
   },
 });
