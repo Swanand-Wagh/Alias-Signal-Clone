@@ -4,7 +4,7 @@
     "slug": "Alias-Signal-Clone",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon.jpg",
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -18,7 +18,7 @@
       "package": "com.alias.Alias-Signal-Clone",
       "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
+        "foregroundImage": "./assets/icon.jpg",
         "backgroundColor": "#FFFFFF"
       }
     },
